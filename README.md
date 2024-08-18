@@ -87,10 +87,10 @@ python "Check I2C Speed.py"
 
 ### Changing I2C Speed to 400kHz
 
-1. Open the `/boot/config.txt` file:
+1. Open the `/boot/firmware/config.txt` file:
 
    ```bash
-   sudo nano /boot/config.txt
+   sudo nano /boot/firmware/config.txt
    ```
 
 2. Add or modify the following line to set the I2C speed:
