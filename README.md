@@ -1,5 +1,8 @@
+Here’s the updated README with a "Resources" section instead of "Contributing":
 
+---
 
+# Modal and Damping Analysis of a Cantilever Beam
 
 ## Contents
 
@@ -177,13 +180,14 @@ This script saves the accelerometer data to a numpy file while maintaining a fix
 
 ## To-Do List
 
-- Implement FIFO (First-In, First-Out) buffering for a more stable sample rate. This will further improve the accuracy and reliability of the measured peak frequency.
+- Implement FIFO (First-In, First-Out) buffering for a more stable sample rate. This will further improve the accuracy and reliability of the recorded data.
 
 ## Resources
 
-https://www.analog.com/en/products/adxl357.html
-https://en.wikipedia.org/wiki/Short-time_Fourier_transform
-https://en.wikipedia.org/wiki/Fast_Fourier_transform
+- [ADXL357 Accelerometer Information](https://www.analog.com/en/products/adxl357.html)
+- [Short-Time Fourier Transform (STFT) on Wikipedia](https://en.wikipedia.org/wiki/Short-time_Fourier_transform)
+- [Fast Fourier Transform (FFT) on Wikipedia](https://en.wikipedia.org/wiki/Fast_Fourier_transform)
+
 ## License
 
 This project is licensed under the MIT License. See the `LICENSE` file for more details.
