@@ -8,12 +8,33 @@ from scipy.fft import fft
 from tkinter import ttk, filedialog, messagebox
 
 # List of frequencies for horizontal lines
-#horizontal_lines = [6, 37.3, 106.1, 210.6, 315.2, 419.7, 524.3, 628.8, 733.4, 838, 942.5, 1047.1] ##50cm
-#horizontal_lines = [8,79, 57.5,163.2, 324.8, 476.5, 628.1, 779.8, 931.4, 1083.1, 1234.7, 1386.4] ##40cm
-# horizontal_lines = [4.1,26.1,74.1,146.6,219.1,291.6,364.1,436.6,509.1,581.6,654.1,726.6] ##60cm
-#horizontal_lines = [14.9,99.9,285.7,571.6,855.4,1149.3,1433.1,1716.9,1990.7,2264.6,2538.4,2812.3] ##30cm
-horizontal_lines = [10,20,30,40,50,60,70,80,90,100] ##vib generator
-def plot_fft_stft(timestamps, waveform, output_dir, freq=44100, ns=1024*2, smoothing=0, threshold=0.005):
+horizontal_lines_50cm = [6, 37.3, 106.1, 210.6, 315.2, 419.7, 524.3, 628.8, 733.4, 838, 942.5, 1047.1] ##50cm
+horizontal_lines_40cm = [8,79, 57.5,163.2, 324.8, 476.5, 628.1, 779.8, 931.4, 1083.1, 1234.7, 1386.4] ##40cm
+horizontal_lines_60cm = [4.1,26.1,74.1,146.6,219.1,291.6,364.1,436.6,509.1,581.6,654.1,726.6] ##60cm
+horizontal_lines_30cm = [14.9,99.9,285.7,571.6,855.4,1149.3,1433.1,1716.9,1990.7,2264.6,2538.4,2812.3] ##30cm
+horizontal_lines_linear = [10,20,30,40,50,60,70,80,90,100] ##vib generator
+horizontal_lines = None
+lines_dict = {'50': horizontal_lines_50cm, '40': horizontal_lines_40cm, '60': horizontal_lines_60cm, '30': horizontal_lines_30cm, 'linear': horizontal_lines_linear}
+
+
+horizontal_lines=lines_dict['50cm']
+
+    """
+    Plots the Fast Fourier Transform (FFT) and Short-time Fourier Transform (STFT) of a given waveform.
+
+    Parameters:
+    timestamps (list): A list of timestamps corresponding to the waveform.
+    waveform (list): The input waveform to be transformed.
+    output_dir (str): The directory where the plot will be saved.
+    freq (int, optional): The sampling frequency of the waveform. Defaults to 4000.
+    ns (int, optional): The number of samples to use for the STFT. Defaults to 1024*2.
+    smoothing (int, optional): The smoothing factor for the FFT. Defaults to 0.
+    threshold (float, optional): The threshold for peak detection. Defaults to 0.005.
+
+    Returns:
+    None
+    """
+def plot_fft_stft(timestamps, waveform, output_dir, freq=4000, ns=1024*2, smoothing=0, threshold=0.005):
     # Find frequency from timestamps
     freq = int((len(timestamps)-2000)/ timestamps[-2001]) # find average sampling frequency
     
