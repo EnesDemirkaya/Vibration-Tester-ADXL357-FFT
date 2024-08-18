@@ -1,6 +1,4 @@
-Here’s the updated README with a "Resources" section instead of "Contributing":
 
----
 
 # Modal and Damping Analysis of a Cantilever Beam
 
