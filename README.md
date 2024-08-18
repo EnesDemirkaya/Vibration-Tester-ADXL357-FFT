@@ -22,7 +22,7 @@
    - [Recording Data](#recording-data)
    - [Analyzing Data](#analyzing-data)
 7. [To-Do List](#to-do-list)
-8. [Contributing](#contributing)
+8. [Resources](#resources)
 9. [License](#license)
 10. [Contact](#contact)
 
@@ -179,10 +179,11 @@ This script saves the accelerometer data to a numpy file while maintaining a fix
 
 - Implement FIFO (First-In, First-Out) buffering for a more stable sample rate. This will further improve the accuracy and reliability of the measured peak frequency.
 
-## Contributing
+## Resources
 
-Contributions to this project are welcome! If you have ideas for improvement, encounter any issues, or would like to contribute new features, feel free to open an issue or submit a pull request.
-
+https://www.analog.com/en/products/adxl357.html
+https://en.wikipedia.org/wiki/Short-time_Fourier_transform
+https://en.wikipedia.org/wiki/Fast_Fourier_transform
 ## License
 
 This project is licensed under the MIT License. See the `LICENSE` file for more details.
