@@ -41,13 +41,23 @@ OUTZ_L_XL = 0x2C
 OUTZ_H_XL = 0x2D
 
 
-def init_LSM6DS3():
-    bus.write_byte_data(LSM6DS3_ADDR, CTRL1_XL, 0x80)  # 1.66 kHz, 4g, High-performance mode
-    bus.write_byte_data(LSM6DS3_ADDR, CTRL2_G, 0x00)   # Gyroscope in power-down mode
-    bus.write_byte_data(LSM6DS3_ADDR, CTRL3_C, 0x44)   # Enable I2C fast mode
-    bus.write_byte_data(LSM6DS3_ADDR, CTRL6_C, 0x10)   # Enable accelerometer high-performance mode
-    bus.write_byte_data(LSM6DS3_ADDR, CTRL8_XL, 0x09)  # Enable LPF2 and set cutoff to 400Hz
+def init_ADXL357():
+    bus = smbus.SMBus(1)
 
+    # Step 1: Reset the ADXL357
+    bus.write_byte_data(I2C_ADDRESS, REG_RESET, 0x52)  # Reset command
+    time.sleep(0.1)  # Wait for reset to complete
+
+    # Step 2: Set the desired output data rate (ODR)
+    bus.write_byte_data(I2C_ADDRESS, REG_ODR, 0x03)  # Example setting for ODR (adjust as needed)
+
+    # Step 3: Set the range (±10g, ±20g, ±40g)
+    bus.write_byte_data(I2C_ADDRESS, REG_RANGE, 0x01)  # Example setting for ±10g (adjust as needed)
+
+    # Step 4: Set the device to measurement mode
+    bus.write_byte_data(I2C_ADDRESS, REG_POWER_CTL, 0x06)  # Measurement mode
+
+    print("ADXL357 initialized and set to measurement mode.")
 # Global variables for accelerometer data
 z_axis_data = []  # List to store Z-axis accelerometer data
 timestamps_data = []  # List to store timestamps
@@ -127,22 +137,7 @@ def read_data_thread(duration):
     # After reading is done, put the data in the queue
     data_queue.put((z_axis_data, timestamps_data))
 
-# Function to generate sine waveform using chirp
-def generate_sine_waveform(start_freq, end_freq, sweep_time, sample_rate=44100):
-    t = np.linspace(0, sweep_time, int(sample_rate * sweep_time))
-    waveform = chirp(t, f0=start_freq, f1=end_freq, t1=sweep_time, method='linear')
-    return waveform, t
-    
-# Save the notes
-def save_notes(notes, run_time, sweep_time, start_freq, end_freq):
-    with open(os.path.join(run_time, f"notes{run_time}.txt"), 'w') as f:
-        f.write("TEST RUN NOTES\n")
-        f.write(f"{run_time}\n")
-        f.write(f"Sweep Time: {sweep_time}s\n")
-        f.write(f"Start Frequency: {start_freq}Hz\n")
-        f.write(f"End Frequency: {end_freq}Hz\n")
-        f.write("Wave Shape: Sine\n")
-        f.write(f"User Notes: {notes}\n")
+
 
 # Main function to run the initialization
 def main():
