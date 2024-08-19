@@ -1,3 +1,5 @@
+#initialization_adxl.py
+
 import os
 os.environ['DISPLAY'] = ':0'  # to run the code from ssh but show on the monitor
 
@@ -28,7 +30,7 @@ bus = smbus.SMBus(1)
 I2C_ADDRESS = 0x1D  # 0x1D for the ADXL357, SOMETIMES 0X53 depending on configuration
 
 # Define the measurement range (options: ±10g, ±20g, ±40g)
-MEASUREMENT_RANGE = 40  # Change this value to 10, 20, or 40 for different ranges
+MEASUREMENT_RANGE = 10  # Change this value to 10, 20, or 40 for different ranges
 
 # ADXL357 Register Addresses
 REG_ZDATA3 = 0x0E
