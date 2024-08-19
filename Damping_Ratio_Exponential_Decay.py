@@ -1,4 +1,4 @@
-#Damping ratio Exponential Decay.py
+#Damping_Ratio_Exponential_Decay.py
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
