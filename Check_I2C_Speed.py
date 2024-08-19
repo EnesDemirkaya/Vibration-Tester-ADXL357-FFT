@@ -1,3 +1,5 @@
+#Check_I2C_Speed.py
+
 def check_i2c_speed_config():
     try:
         with open('/boot/firmware/config.txt', 'r') as file:
