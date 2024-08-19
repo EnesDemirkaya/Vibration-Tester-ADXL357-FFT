@@ -1,3 +1,5 @@
+#Plot_STFT_and_FFT.py
+
 import os
 os.environ['DISPLAY'] = ':0'  # to run the code from ssh but show on the monitor
 
