@@ -185,6 +185,7 @@ This script saves the accelerometer data to a numpy file while maintaining a fix
 - [ADXL357 Accelerometer Information](https://www.analog.com/en/products/adxl357.html)
 - [Short-Time Fourier Transform (STFT) on Wikipedia](https://en.wikipedia.org/wiki/Short-time_Fourier_transform)
 - [Fast Fourier Transform (FFT) on Wikipedia](https://en.wikipedia.org/wiki/Fast_Fourier_transform)
+- https://www.youtube.com/watch?v=2dZPAv0q-9U
 
 ## License
 
