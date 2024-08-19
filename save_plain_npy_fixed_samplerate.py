@@ -8,6 +8,7 @@ from datetime import datetime
 import smbus2 as smbus
 
 # I2C address
+MEASUREMENT_RANGE = 20  # Change this value to 10, 20, or 40 for different ranges
 I2C_ADDRESS = 0x1D  # 0x1D for the ADXL357, SOMETIMES 0X53 depending on configuration
 goal_sampling_rate = 4000  # Hz
 # ADXL357 Register Addresses
@@ -15,6 +16,7 @@ REG_ZDATA3 = 0x0E
 REG_ODR_FILTER = 0x28
 REG_POWER_CTL = 0x2D  # Power Control register
 REG_RESET = 0x2F      # Reset register
+REG_RANGE = 0x2C      # Range register for ADXL357
 
 # Initialize the I2C bus
 bus = smbus.SMBus(1)
@@ -27,6 +29,16 @@ def init_ADXL357():
     # Set ODR to 4000 Hz, no filters applied
     bus.write_byte_data(I2C_ADDRESS, REG_ODR_FILTER, 0x00)
     # bus.write_byte_data(I2C_ADDRESS, REG_ODR_FILTER, 0x01) # 2000Hz
+    # Set the measurement range
+    if MEASUREMENT_RANGE == 10:
+        bus.write_byte_data(I2C_ADDRESS, REG_RANGE, 0x01)  # ±10g
+    elif MEASUREMENT_RANGE == 20:
+        bus.write_byte_data(I2C_ADDRESS, REG_RANGE, 0x02)  # ±20g
+    elif MEASUREMENT_RANGE == 40:
+        bus.write_byte_data(I2C_ADDRESS, REG_RANGE, 0x03)  # ±40g
+    else:
+        raise ValueError("Invalid measurement range specified. Use 10, 20, or 40.")
+    bus.write_byte_data(I2C_ADDRESS, REG_POWER_CTL, 0x06)  # Enable measurement mode
 
     
     # Set the device to measurement mode
@@ -39,9 +51,19 @@ def read_accel_data():
     # Combine bytes and apply two's complement
     z_data = (z[0] << 12) | (z[1] << 4) | (z[2] >> 4)
     
-    if z_data & (1 << 19): z_data -= (1 << 20)
+    # Apply two's complement correction
+    if z_data & (1 << 19):
+        z_data -= (1 << 20)
     
-    return z_data * 0.0000187
+    if MEASUREMENT_RANGE == 10:
+        z_g = z_data * 0.0000187  # Scale for 10g range
+    elif MEASUREMENT_RANGE == 20:
+        z_g = z_data * 0.0000187 * 2  # Scale for 20g range (double the 10g range)
+    elif MEASUREMENT_RANGE == 40:
+        z_g = z_data * 0.0000187 * 4  # Scale for 40g range (four times the 10g range)
+
+    return z_g
+
 
 def save_accelerometer_numpy(z_data, timestamps, run_time):
     np.save(os.path.join(run_time, 'accelerometer_data.npy'), np.array([timestamps, z_data]))
