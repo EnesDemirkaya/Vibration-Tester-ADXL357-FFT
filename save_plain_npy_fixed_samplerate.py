@@ -1,3 +1,5 @@
+#save_plain_npy_fixed_samplerate.py
+
 import os
 os.environ['DISPLAY'] = ':0'  # to run the code from ssh but show on the monitor do not delete
 import time
