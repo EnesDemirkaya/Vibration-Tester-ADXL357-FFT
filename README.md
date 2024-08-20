@@ -112,12 +112,13 @@ python "Check I2C Speed.py"
 ### Folder Structure
 
 - **`ADXL357/`**: Contains scripts and tools specifically for the ADXL357 accelerometer.
-- **`LSM6DS3/`**: Contains scripts for the LSM6DS3 accelerometer.
-- **`Recordings/`**: A folder with recorded data and numpy array files for later comparison.
+- **`LSM6DS3 Accelerometer/`**: Contains scripts for the LSM6DS3 accelerometer.
+- **`Example Recordings/`**: A folder with recorded data and numpy array files for later comparison.
 - **`Check I2C Speed.py`**: Script to check the I2C communication speed on the Raspberry Pi.
 - **`Damping ratio Exponential Decay.py`**: Script to calculate the damping ratio using the exponential decay method.
 - **`Plot STFT and FFT.py`**: Script to generate and visualize the Short-Time Fourier Transform (STFT) and Fast Fourier Transform (FFT) of the accelerometer data.
 - **`save_plain_npy_fixed_samplerate.py`**: Script to save accelerometer data with a fixed sampling rate.
+- **`Play_Sweep_and_Record.py`**: Script to save accelerometer data while playin a sweep sound for the shaker.
 
 ### Code Descriptions
 
@@ -129,15 +130,15 @@ This script checks the current I2C bus speed on the Raspberry Pi. It helps ensur
 
 This script calculates the damping ratio of the cantilever beam using the exponential decay method. The damping ratio is a crucial parameter in understanding how quickly vibrations diminish over time, indicating the amount of energy lost during each oscillation cycle.
 
-- **Input:** Accelerometer data recorded during the beam's oscillation.
-- **Output:** Damping ratio value that indicates how quickly the system's vibrations are dying out.
+- **Input:** Numpy array of accelerometer data recorded during the beam's oscillation.
+- **Output:** Damping ratio value that indicates how quickly the system's vibrations are dying out, filepath of the saved time response plot with found peaks and decay envlope.
 
 #### 3. `Plot STFT and FFT.py`
 
-This script plots both the Short-Time Fourier Transform (STFT) and the Fast Fourier Transform (FFT) of the accelerometer data. These frequency analysis tools are used to understand the frequency components of the vibrations over time and can provide insights into the dynamic behavior of the cantilever beam.
+This script plots both the Short-Time Fourier Transform (STFT) and the Fast Fourier Transform (FFT) of the accelerometer data.
 
-- **STFT:** Helps analyze how the frequency content of the signal evolves over time.
-- **FFT:** Provides a snapshot of the frequency content of the entire signal.
+- **STFT:** Helps analyze how the frequency content of the signal evolves over time. Used to compare how the recording went.
+- **FFT:** Provides a snapshot of the frequency content of the entire signal. Used to find frequency peaks aka natural freq of the recording
 
 #### 4. `save_plain_npy_fixed_samplerate.py`
 
@@ -158,9 +159,12 @@ This script saves the accelerometer data to a numpy file while maintaining a fix
 
 2. Run the recording script to collect data at a fixed sample rate:
 
+  2.1 To only save: (optionally make volume zero and use the second option)
+
    ```bash
    python save_plain_npy_fixed_samplerate.py
    ```
+  2.2 To play sweep sound while saving: (Make sure volume level is decent)
 
 #### Analyzing Data
 
