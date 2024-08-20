@@ -126,14 +126,7 @@ def find_damping_ratio(file_path=None):
 
     # Show the plot
     plt.show()
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.signal import find_peaks
-from scipy.optimize import curve_fit
-import os
-from datetime import datetime
-from tkinter import Tk
-from tkinter.filedialog import askopenfilename
+
 
 def find_damping_ratio(file_path=None):
     """
