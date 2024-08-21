@@ -1,5 +1,3 @@
-#save_plain_npy_fixed_samplerate.py
-
 import os
 os.environ['DISPLAY'] = ':0'  # to run the code from ssh but show on the monitor do not delete
 import time
@@ -8,7 +6,6 @@ from datetime import datetime
 import smbus2 as smbus
 
 # I2C address
-MEASUREMENT_RANGE = 20  # Change this value to 10, 20, or 40 for different ranges
 I2C_ADDRESS = 0x1D  # 0x1D for the ADXL357, SOMETIMES 0X53 depending on configuration
 goal_sampling_rate = 4000  # Hz
 # ADXL357 Register Addresses
@@ -21,14 +18,14 @@ REG_RANGE = 0x2C      # Range register for ADXL357
 # Initialize the I2C bus
 bus = smbus.SMBus(1)
 
-def init_ADXL357():
+def init_ADXL357(MEASUREMENT_RANGE):
     # Reset the device
     bus.write_byte_data(I2C_ADDRESS, REG_RESET, 0x52)  # Reset command
     time.sleep(0.1)  # Wait for the reset to complete
     
     # Set ODR to 4000 Hz, no filters applied
     bus.write_byte_data(I2C_ADDRESS, REG_ODR_FILTER, 0x00)
-    # bus.write_byte_data(I2C_ADDRESS, REG_ODR_FILTER, 0x01) # 2000Hz
+
     # Set the measurement range
     if MEASUREMENT_RANGE == 10:
         bus.write_byte_data(I2C_ADDRESS, REG_RANGE, 0x01)  # ±10g
@@ -38,13 +35,10 @@ def init_ADXL357():
         bus.write_byte_data(I2C_ADDRESS, REG_RANGE, 0x03)  # ±40g
     else:
         raise ValueError("Invalid measurement range specified. Use 10, 20, or 40.")
-    bus.write_byte_data(I2C_ADDRESS, REG_POWER_CTL, 0x06)  # Enable measurement mode
-
     
-    # Set the device to measurement mode
     bus.write_byte_data(I2C_ADDRESS, REG_POWER_CTL, 0x06)  # Enable measurement mode
 
-def read_accel_data():
+def read_accel_data(MEASUREMENT_RANGE):
     # Read 3 bytes for Z-axis
     z = bus.read_i2c_block_data(I2C_ADDRESS, REG_ZDATA3, 3)
     
@@ -64,11 +58,11 @@ def read_accel_data():
 
     return z_g
 
-
 def save_accelerometer_numpy(z_data, timestamps, run_time):
     np.save(os.path.join(run_time, 'accelerometer_data.npy'), np.array([timestamps, z_data]))
+    return os.path.join(run_time, 'accelerometer_data.npy')
 
-def collect_accelerometer_data():
+def collect_accelerometer_data(duration=None, custom_name=None, measurement_range=10):
     # Global variables for accelerometer data
     z_axis_data = []
     timestamps_data = []
@@ -80,7 +74,7 @@ def collect_accelerometer_data():
         nonlocal last_time
         try:
             # Read data
-            z = read_accel_data()
+            z = read_accel_data(measurement_range)
 
             # Calculate the current time and elapsed time
             current_time = time.time()
@@ -102,6 +96,7 @@ def collect_accelerometer_data():
         except Exception as e:
             print(f"Error: {e}")
 
+    # Load last run settings if available
     try:
         with open('last_run.txt', 'r') as file:
             last_duration = float(file.readline().strip())
@@ -110,12 +105,18 @@ def collect_accelerometer_data():
         last_duration = 10.0  # Default duration
         last_custom_name = "default_name"
 
-    duration = float(input(f"Enter the duration for data collection (in seconds) [{last_duration}]: ") or last_duration)
-    custom_name = input(f"Enter a custom name to append to the folder [{last_custom_name}]: ") or last_custom_name
+    # Set parameters if not provided
+    if duration is None:
+        duration = float(input(f"Enter the duration for data collection (in seconds) [{last_duration}]: ") or last_duration)
+    if custom_name is None:
+        custom_name = input(f"Enter a custom name to append to the folder [{last_custom_name}]: ") or last_custom_name
+    if measurement_range is None:
+        measurement_range = int(input("Enter the measurement range (10, 20, or 40): "))
+    
     start_time = time.time()  # Initialize start_time
     last_time = start_time  # Initialize last_time
 
-    init_ADXL357()
+    init_ADXL357(measurement_range)
 
     # Create directory for the current run
     run_time = datetime.now().strftime(f'%m-%d_%H-%M-%S_{custom_name}')
@@ -133,7 +134,8 @@ def collect_accelerometer_data():
             while time.time() - loop_start_time < (1.0 / goal_sampling_rate):
                 pass  # Busy-wait until the next sample time
 
-    save_accelerometer_numpy(z_axis_data, timestamps_data, run_time)
+    # Save data and return the filepath
+    npy_file_path = save_accelerometer_numpy(z_axis_data, timestamps_data, run_time)
 
     if intervals:
         sampling_rate_std = np.std([1 / interval for interval in intervals])
@@ -145,5 +147,8 @@ def collect_accelerometer_data():
         file.write(f"{duration}\n")
         file.write(f"{custom_name}\n")
 
+    return npy_file_path
+
 if __name__ == "__main__":
-    collect_accelerometer_data()
+    filepath = collect_accelerometer_data()
+    print(f"Numpy array saved at: {filepath}")

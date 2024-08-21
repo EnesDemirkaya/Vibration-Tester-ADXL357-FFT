@@ -56,17 +56,18 @@ data_lock = threading.Lock()
 input_file_path = "last_inputs.json"
 
 # Function to save inputs to a file
-def save_inputs(duration:float, start_freq:float, end_freq:float, notes:str) -> None:
+def save_inputs(duration: float, start_freq: float, end_freq: float, volume: float, notes: str, filename: str) -> None:
     """Save session input to a JSON file."""
     inputs = {
         "duration": duration,
         "start_freq": start_freq,
         "end_freq": end_freq,
-        "notes": notes
+        "volume": volume,
+        "notes": notes,
+        "filename": filename
     }
     with open("last_inputs.json", "w") as f:
         json.dump(inputs, f)
-
 
 def save_notes(notes:str, run_time:float, duration:float, start_freq:float, end_freq:float) -> None:
     """Save session notes to a JSON file."""
