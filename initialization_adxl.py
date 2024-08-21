@@ -56,7 +56,8 @@ data_lock = threading.Lock()
 input_file_path = "last_inputs.json"
 
 # Function to save inputs to a file
-def save_inputs(duration, start_freq, end_freq, notes):
+def save_inputs(duration:float, start_freq:float, end_freq:float, notes:str) -> None:
+    """Save session input to a JSON file."""
     inputs = {
         "duration": duration,
         "start_freq": start_freq,
@@ -65,7 +66,9 @@ def save_inputs(duration, start_freq, end_freq, notes):
     }
     with open("last_inputs.json", "w") as f:
         json.dump(inputs, f)
-def save_notes(notes, run_time, duration, start_freq, end_freq):
+
+
+def save_notes(notes:str, run_time:float, duration:float, start_freq:float, end_freq:float) -> None:
     """Save session notes to a JSON file."""
     notes_data = {
         "notes": notes,
@@ -76,8 +79,14 @@ def save_notes(notes, run_time, duration, start_freq, end_freq):
     with open(os.path.join(run_time, 'notes.json'), 'w') as f:
         json.dump(notes_data, f)
 
+
+#@QUESTION
+        #DOES THIS FUNCTION RETURN A LOADED FILE? SEEMS UNCLEAR
+        #SHOULD BE MERGED WITH LOAD_INPUTS IN PLAY_SWEEP_AND_RECORD
+
 # Function to load inputs from a file
-def load_inputs(duration_entry, start_freq_entry, end_freq_entry, notes_entry):
+def load_inputs(duration_entry, start_freq_entry, end_freq_entry, notes_entry) -> None:
+    """load inputs from a JSON file."""
     if os.path.exists(input_file_path):
         with open(input_file_path, "r") as f:
             inputs = json.load(f)
@@ -160,10 +169,7 @@ def read_data_thread(duration):
     # After reading is done, put the data in the queue
     data_queue.put((z_axis_data, timestamps_data))
 
-# Main function to run the initialization
-def main():
-    # Initialize the sensor
-    init_ADXL357()
+
 
 if __name__ == "__main__":
-    main()
+    init_ADXL357

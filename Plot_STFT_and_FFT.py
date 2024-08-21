@@ -10,8 +10,15 @@ from scipy.signal import stft, butter, filtfilt, find_peaks
 from scipy.fft import fft
 from tkinter import filedialog
 
+from typing import Optional
+
 # This function processes the accelerometer data from a numpy file and plots the FFT and STFT
-def plot_fft_stft_from_file(file_path=None, smoothing=0, threshold=0.005):
+def plot_fft_stft_from_file(fname:Optional[str]=None,
+                            file_path:Optional[str]=None,
+                            output_path:Optional[str]=None,
+                             smoothing:Optional[float]=0,
+                             threshold:Optional[float]=0.005
+                            ):
     """
     This function loads accelerometer data from a specified numpy (.npy) file, applies a low-pass filter,
     and then plots both the FFT (Fast Fourier Transform) and STFT (Short-Time Fourier Transform) of the signal.
@@ -31,8 +38,12 @@ def plot_fft_stft_from_file(file_path=None, smoothing=0, threshold=0.005):
         return
 
     # Determine the output directory based on the file path
-    output_dir = os.path.dirname(file_path)
-    os.makedirs(output_dir, exist_ok=True)  # Ensure that the directory exists
+    if output_path is None:
+        output_dir = os.path.dirname(file_path)
+        os.makedirs(output_dir, exist_ok=True)  # Ensure that the directory exists
+    else: 
+        output_dir = os.path.dirname(output_path)
+        os.makedirs(output_dir, exist_ok=True)  # Ensure that the directory exists
 
     # Load the data from the selected numpy file
     data = np.load(file_path)
@@ -56,10 +67,21 @@ def plot_fft_stft_from_file(file_path=None, smoothing=0, threshold=0.005):
     plot_fft_stft(timestamps, z_data, output_dir, smoothing=0, threshold=threshold)
     
     # Plot the FFT and STFT with the specified smoothing
-    plot_fft_stft(timestamps, z_data, output_dir, smoothing=smoothing, threshold=threshold)
+    if smoothing > 0:
+        plot_fft_stft(timestamps, z_data, output_dir, fname, smoothing=smoothing, threshold=threshold)
 
 # This function calculates and plots the FFT and STFT of the provided waveform
-def plot_fft_stft(timestamps, waveform, output_dir, freq=44100, ns=1024*2, smoothing=0, threshold=0.005):
+def plot_fft_stft(
+        timestamps:np.ndarray, 
+        waveform:np.ndarray, 
+        output_dir:str, 
+        file_name:Optional[str]=None, 
+        freq:Optional[int]=44100, 
+        ns:Optional[int]=1024*2, 
+        smoothing:Optional[float]=0, 
+        threshold:Optional[float]=0.005,
+        show_plot:Optional[bool]=True
+        ):
     """
     This function calculates and plots the FFT (Fast Fourier Transform) and STFT (Short-Time Fourier Transform)
     of a given waveform.
@@ -75,7 +97,6 @@ def plot_fft_stft(timestamps, waveform, output_dir, freq=44100, ns=1024*2, smoot
     """
     # Estimate the sampling frequency based on the timestamps
     freq = int((len(timestamps)-2000)/ timestamps[-2001])
-    print(freq)
     
     # Calculate the overlap for the STFT (50% overlap is common)
     overlap = ns // 2
@@ -132,12 +153,18 @@ def plot_fft_stft(timestamps, waveform, output_dir, freq=44100, ns=1024*2, smoot
     ax1.set_xlabel('Time [sec]')
 
     plt.tight_layout()
-    plt.savefig(os.path.join(output_dir, f'fft_stft_plot_smoothing_{smoothing}.png'))
+    if file_name is None:
+        plt.savefig(os.path.join(output_dir, f'fft_stft_plot_smoothing_{smoothing}.png'))
+    else:
+        plt.savefig(os.path.join(output_dir, f'{file_name}_{smoothing}.png'))
+
+
     print(f"FFT and STFT plots saved in {output_dir}")
-    plt.show()
+    if show_plot == True:
+        plt.show()
 
 # Function to apply a low-pass filter to data
-def low_pass_filter(data, cutoff_freq, fs, order=2):
+def low_pass_filter(data:np.ndarray, cutoff_freq:float, fs:float, order:Optional[int]=2) -> np.ndarray:
     """
     This function applies a low-pass filter to the input data to remove high-frequency noise.
 
@@ -156,5 +183,6 @@ def low_pass_filter(data, cutoff_freq, fs, order=2):
     filtered_data = filtfilt(b, a, data)  # Apply the filter to the data
     return filtered_data
 
-# Example usage of the main function
-plot_fft_stft_from_file(smoothing=100)
+
+if __name__ == "__main__":
+    plot_fft_stft_from_file(smoothing=100)

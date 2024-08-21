@@ -5,14 +5,16 @@ from scipy.signal import find_peaks
 from scipy.optimize import curve_fit
 import os
 # main_app.py
-import os
+
 os.environ['DISPLAY'] = ':0'  # to run the code from ssh but show on the monitor
 
 from datetime import datetime
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 
-def find_damping_ratio(file_path=None):
+from typing import Optional
+
+def find_damping_ratio(file_path:Optional[str] = None, show_plot:bool = True, save_fig:bool = True, save_fig_path:Optional[str] = None) -> None:
     """
     Analyze accelerometer data from a selected numpy file or from the provided file path,
     fit it to an exponential decay curve, and save a plot of the results with relevant annotations.
@@ -116,7 +118,7 @@ def find_damping_ratio(file_path=None):
     plot_path = os.path.splitext(file_path)[0] + "_log_decay_plot"
     run_time = datetime.now().strftime(f'%m-%d_%H-%M-%S_')
 
-    plt.savefig(plot_path + run_time + ".png", dpi=600)  # Set dpi to 600 for higher resolution
+    
     print(f"Initial Amplitude (A0): {A0:.4f}")
     print(f"Decay Rate (beta): {beta:.4f}")
     print(f"Damping Ratio (zeta): {zeta_ld:.4f}")
@@ -124,11 +126,18 @@ def find_damping_ratio(file_path=None):
     print(f"Plot saved to: {plot_path}")
     print(f"omega_d: {omega_d:.4f}")
 
-    # Show the plot
-    plt.show()
+    if show_plot == True:
+        # Show the plot
+        plt.show()
+
+    if save_fig == True:
+        if save_fig_path is None:
+            plt.savefig(plot_path + run_time + ".png", dpi=600)  # Set dpi to 600 for higher resolution
+        else:
+            plt.savefig(fname = save_fig_path + run_time + ".png")
 
 
-def find_damping_ratio(file_path=None):
+def find_damping_ratio(file_path:Optional[str] = None, show_plot:bool = True, save_fig:bool = True, save_fig_path:Optional[str] = None):
     """
     Analyze accelerometer data from a selected numpy file or from the provided file path,
     fit it to an exponential decay curve, and save a plot of the results with relevant annotations.
@@ -232,7 +241,6 @@ def find_damping_ratio(file_path=None):
     plot_path = os.path.splitext(file_path)[0] + "_log_decay_plot"
     run_time = datetime.now().strftime(f'%m-%d_%H-%M-%S_')
 
-    plt.savefig(plot_path + run_time + ".png", dpi=600)  # Set dpi to 600 for higher resolution
     print(f"Initial Amplitude (A0): {A0:.4f}")
     print(f"Decay Rate (beta): {beta:.4f}")
     print(f"Damping Ratio (zeta): {zeta_ld:.4f}")
@@ -240,6 +248,17 @@ def find_damping_ratio(file_path=None):
     print(f"Plot saved to: {plot_path}")
     print(f"omega_d: {omega_d:.4f}")
 
-    # Show the plot
-    plt.show() 
-find_damping_ratio()
+    if show_plot == True:
+        # Show the plot
+        plt.show()
+
+    if save_fig == True:
+        if save_fig_path is None:
+            plt.savefig(plot_path + run_time + ".png", dpi=600)  # Set dpi to 600 for higher resolution
+        else:
+            plt.savefig(fname = save_fig_path + run_time + ".png")
+
+
+if __name__ == "__main__":
+
+    find_damping_ratio()

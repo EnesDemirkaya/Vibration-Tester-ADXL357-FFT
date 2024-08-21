@@ -9,6 +9,8 @@ from datetime import datetime
 import sounddevice as sd
 import threading
 
+from typing import Optional
+
 
 
 
@@ -16,28 +18,17 @@ import queue
 from scipy.io import wavfile
 from scipy.signal import chirp
 from tkinter import filedialog, Tk
+from .initialization_adxl import save_inputs
 
 from initialization_adxl import (
     save_notes,
     read_data_thread, data_queue
 )
 
-def generate_sine_waveform(start_freq, end_freq, sweep_time, sample_rate=44100):
+def generate_sine_waveform(start_freq:float, end_freq:float, sweep_time:float, sample_rate:int=44100):
     t = np.linspace(0, sweep_time, int(sample_rate * sweep_time))
     waveform = chirp(t, f0=start_freq, f1=end_freq, t1=sweep_time, method='linear')
     return waveform, t
-
-def save_inputs(duration, start_freq, end_freq, volume, notes, filename):
-    data = {
-        'duration': duration,
-        'start_freq': start_freq,
-        'end_freq': end_freq,
-        'volume': volume,
-        'notes': notes,
-        'filename': filename
-    }
-    with open('inputs.json', 'w') as f:
-        json.dump(data, f)
 
 def load_inputs():
     if os.path.exists('inputs.json'):
@@ -53,7 +44,7 @@ def get_input(prompt, previous_value=None):
     value = input(prompt).strip()
     return value if value else previous_value
 
-def save_accelerometer_numpy(z_data, timestamps, run_time, filename):
+def save_accelerometer_numpy(z_data:np.ndarray, timestamps:np.ndarray, run_time:str, filename:str) -> None:
     np.save(os.path.join(run_time, f'{filename}.npy'), np.array([timestamps, z_data]))
 
 def load_accelerometer_data():
@@ -69,17 +60,32 @@ def load_accelerometer_data():
     data = np.load(file_path)
     return data[0], data[1]
 
-def save_data(timestamps_acc, waveform_acc, run_time, filename, sweep=False, timestamps_sweep=None, waveform_sweep=None):
+def save_data(
+              timestamps_acc:np.ndarray, 
+              waveform_acc:np.ndarray, 
+              run_time:str, filename:str, 
+              sweep:Optional[np.ndarray]=False, 
+              timestamps_sweep:Optional[np.ndarray]=None, 
+              waveform_sweep:Optional[np.ndarray]=None
+              ):
     """Save data from the accelerometer and optionally the sweep waveform."""
     
     # Save the accelerometer data
     save_accelerometer_numpy(waveform_acc, timestamps_acc, run_time, filename)
     
-    if sweep and timestamps_sweep is not None and waveform_sweep is not None:
+    if sweep and timestamps_sweep and waveform_sweep is not None:
         # Save the sweep data separately
         np.save(os.path.join(run_time, f'{filename}_sweep.npy'), np.array([timestamps_sweep, waveform_sweep]))
 
-def play_and_record(duration=None, start_freq=None, end_freq=None, volume=None, notes=None, filename=None):
+def play_and_record(
+        duration:Optional[float]=None, 
+        start_freq:Optional[float]=None, 
+        end_freq:Optional[float]=None, 
+        volume:Optional[float]=None, 
+        notes:Optional[float]=None, 
+        filename:Optional[float]=None
+        ):
+    
     previous_inputs = load_inputs()
 
     duration = duration or get_input("Sweep Time (s)", previous_inputs.get('duration'))
@@ -109,7 +115,17 @@ def play_and_record(duration=None, start_freq=None, end_freq=None, volume=None, 
 
     check_queue_and_save(run_time, timestamps_sweep, waveform, notes, duration, start_freq, end_freq, filename)
 
-def check_queue_and_save(run_time, timestamps_sweep, waveform_sweep, notes, duration, start_freq, end_freq, filename):
+def check_queue_and_save(
+        run_time:float, 
+        timestamps_sweep:np.ndarray, 
+        waveform_sweep:np.ndarray, 
+        notes:str, duration:float, 
+        start_freq:float, 
+        end_freq:float, 
+        filename:str
+        ) -> None:
+    
+
     try:
         data = data_queue.get_nowait()
     except queue.Empty:
@@ -122,5 +138,5 @@ def check_queue_and_save(run_time, timestamps_sweep, waveform_sweep, notes, dura
 
 
 
-# Example of how to call the functions:
-play_and_record()  # Will prompt for all missing information
+if __name__ == "__main__":
+    play_and_record()  # Will prompt for all missing information

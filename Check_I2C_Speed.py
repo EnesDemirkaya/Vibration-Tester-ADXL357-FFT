@@ -16,4 +16,6 @@ def check_i2c_speed_config():
     except Exception as e:
         print(f"Error reading /boot/firmware/config.txt: {e}")
 
-check_i2c_speed_config()
+
+if __name__ == "__main__":
+    check_i2c_speed_config()
