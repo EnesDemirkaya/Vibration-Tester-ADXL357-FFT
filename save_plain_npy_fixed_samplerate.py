@@ -1,5 +1,3 @@
-#save_plain_npy_fixed_samplerate.py
-
 import os
 os.environ['DISPLAY'] = ':0'  # to run the code from ssh but show on the monitor do not delete
 import time
@@ -22,6 +20,16 @@ REG_RANGE = 0x2C      # Range register for ADXL357
 bus = smbus.SMBus(1)
 
 def init_ADXL357():
+    """
+    Initialize the ADXL357 accelerometer.
+
+    This function resets the ADXL357, sets the output data rate (ODR) to 4000 Hz,
+    configures the measurement range based on the global MEASUREMENT_RANGE variable,
+    and puts the device into measurement mode.
+
+    Raises:
+        ValueError: If the MEASUREMENT_RANGE is not set to 10, 20, or 40.
+    """
     # Reset the device
     bus.write_byte_data(I2C_ADDRESS, REG_RESET, 0x52)  # Reset command
     time.sleep(0.1)  # Wait for the reset to complete
@@ -40,11 +48,20 @@ def init_ADXL357():
         raise ValueError("Invalid measurement range specified. Use 10, 20, or 40.")
     bus.write_byte_data(I2C_ADDRESS, REG_POWER_CTL, 0x06)  # Enable measurement mode
 
-    
-    # Set the device to measurement mode
-    bus.write_byte_data(I2C_ADDRESS, REG_POWER_CTL, 0x06)  # Enable measurement mode
-
 def read_accel_data():
+    """
+    Read the Z-axis acceleration data from the ADXL357.
+
+    This function reads 3 bytes of data from the ADXL357, combines them into a 20-bit
+    value, applies two's complement correction, and scales the result according to the
+    measurement range.
+
+    Returns:
+        float: The Z-axis acceleration in g (gravitational units).
+
+    Raises:
+        None
+    """
     # Read 3 bytes for Z-axis
     z = bus.read_i2c_block_data(I2C_ADDRESS, REG_ZDATA3, 3)
     
@@ -64,11 +81,41 @@ def read_accel_data():
 
     return z_g
 
-
 def save_accelerometer_numpy(z_data, timestamps, run_time):
+    """
+    Save the accelerometer data and timestamps as a NumPy file.
+
+    This function saves the Z-axis acceleration data and corresponding timestamps to a 
+    NumPy file in the specified directory.
+
+    Args:
+        z_data (list of float): The Z-axis acceleration data.
+        timestamps (list of float): The corresponding timestamps.
+        run_time (str): The directory name where the data will be saved.
+
+    Returns:
+        None
+    """
     np.save(os.path.join(run_time, 'accelerometer_data.npy'), np.array([timestamps, z_data]))
 
 def collect_accelerometer_data():
+    """
+    Collect and save accelerometer data at a fixed sample rate.
+
+    This function initializes the ADXL357 accelerometer, prompts the user for the data
+    collection duration and a custom name for the output directory, reads the Z-axis
+    acceleration data, and saves it along with timestamps. The sampling rate is
+    adjusted to be as close as possible to the desired goal_sampling_rate. The 
+    collected data is saved as a NumPy file, and the standard deviation of the sampling
+    rate is printed.
+
+    Returns:
+        None
+
+    Raises:
+        ValueError: If an invalid measurement range is specified.
+        Exception: If an error occurs during data collection.
+    """
     # Global variables for accelerometer data
     z_axis_data = []
     timestamps_data = []
