@@ -21,6 +21,40 @@ def plot_fft_stft_from_file(fname: Optional[str] = None,
                             frequency_scale: str = 'log',
                             show_plot=True,
                             crop_beginning: Optional[int] = False):
+    """
+    Load accelerometer data from a numpy file, optionally filter, and plot both FFT and STFT.
+
+    Parameters:
+    -----------
+    fname : str, optional
+        Base name of the output plot file.
+    file_path : str, optional
+        Path to the numpy file containing accelerometer data.
+    output_path : str, optional
+        Path where the output plots will be saved.
+    window_type : str, optional
+        Type of window function to apply to the data before FFT and STFT.
+    smoothing : float, optional
+        Smoothing factor for the FFT plot. Default is 0 (no smoothing).
+    threshold : float, optional
+        Minimum height for peak detection in the FFT plot.
+    zero_padding : int, optional
+        Number of zeros to pad to the signal for FFT computation.
+    annotate_peaks : bool, default=True
+        Whether to annotate peaks in the FFT plot.
+    magnitude_scale : str, default='linear'
+        Scale for the magnitude axis in FFT ('linear' or 'log').
+    frequency_scale : str, default='log'
+        Scale for the frequency axis in FFT and STFT ('linear' or 'log').
+    show_plot : bool, default=True
+        Whether to display the plots after saving.
+    crop_beginning : int, optional
+        Crop the beginning of the data up to the highest peak.
+
+    Returns:
+    --------
+    None
+    """
     if file_path is None:
         file_path = filedialog.askopenfilename(filetypes=[("Numpy files", "*.npy")])
 
@@ -38,7 +72,7 @@ def plot_fft_stft_from_file(fname: Optional[str] = None,
     data = np.load(file_path)
     timestamps = data[0]
     z_data = data[1]
-    if crop_beginning : 
+    if crop_beginning: 
         highest_peak_index = np.argmax(z_data)  # find the index of the maximum value in z_data
         timestamps = timestamps[highest_peak_index:] # crop timestamps from the highest peak onward
         
@@ -62,7 +96,7 @@ def plot_fft_stft_from_file(fname: Optional[str] = None,
     if window_type:
         plot_fft_stft(timestamps, z_data, output_dir, fname, smoothing=smoothing, threshold=threshold,
                       window_type=window_type, zero_padding=zero_padding, annotate_peaks=annotate_peaks,
-                      magnitude_scale=magnitude_scale, frequency_scale=frequency_scale,show_plot=show_plot)
+                      magnitude_scale=magnitude_scale, frequency_scale=frequency_scale, show_plot=show_plot)
 
 
 def plot_fft_stft(timestamps: np.ndarray,
@@ -79,6 +113,44 @@ def plot_fft_stft(timestamps: np.ndarray,
                   annotate_peaks: bool = True,
                   magnitude_scale: str = 'linear',
                   frequency_scale: str = 'log'):
+    """
+    Plot the FFT and STFT of a given waveform, optionally applying windowing, zero padding, and peak annotation.
+
+    Parameters:
+    -----------
+    timestamps : np.ndarray
+        Array of timestamps corresponding to the waveform data.
+    waveform : np.ndarray
+        Array of waveform data (e.g., accelerometer data).
+    output_dir : str
+        Directory where the output plots will be saved.
+    file_name : str, optional
+        Base name for the output plot file.
+    freq : int, optional
+        Sampling frequency of the data. Default is 44100 Hz.
+    ns : int, optional
+        Number of samples per segment for STFT. Default is 2048.
+    smoothing : float, optional
+        Smoothing factor for the FFT plot. Default is 0 (no smoothing).
+    threshold : float, optional
+        Minimum height for peak detection in the FFT plot.
+    show_plot : bool, optional
+        Whether to display the plots after saving. Default is True.
+    window_type : str, optional
+        Type of window function to apply to the data before FFT and STFT.
+    zero_padding : int, optional
+        Number of zeros to pad to the signal for FFT computation.
+    annotate_peaks : bool, default=True
+        Whether to annotate peaks in the FFT plot.
+    magnitude_scale : str, default='linear'
+        Scale for the magnitude axis in FFT ('linear' or 'log').
+    frequency_scale : str, default='log'
+        Scale for the frequency axis in FFT and STFT ('linear' or 'log').
+
+    Returns:
+    --------
+    None
+    """
     
     freq = int((len(timestamps) - 2000) / timestamps[-2001])
     overlap = ns // 2
@@ -179,6 +251,25 @@ def plot_fft_stft(timestamps: np.ndarray,
 
 
 def low_pass_filter(data: np.ndarray, cutoff_freq: float, fs: float, order: Optional[int] = 2) -> np.ndarray:
+    """
+    Apply a low-pass Butterworth filter to the input data.
+
+    Parameters:
+    -----------
+    data : np.ndarray
+        Input data to be filtered.
+    cutoff_freq : float
+        Cutoff frequency for the low-pass filter.
+    fs : float
+        Sampling frequency of the input data.
+    order : int, optional
+        Order of the Butterworth filter. Default is 2.
+
+    Returns:
+    --------
+    filtered_data : np.ndarray
+        The filtered output data.
+    """
     nyquist = 0.5 * fs
     normal_cutoff = cutoff_freq / nyquist
     b, a = butter(order, normal_cutoff, btype='low', analog=False)
@@ -188,4 +279,4 @@ def low_pass_filter(data: np.ndarray, cutoff_freq: float, fs: float, order: Opti
 
 if __name__ == "__main__":
     plot_fft_stft_from_file(file_path='/home/cslab/Desktop/Vibration-Tester-ADXL357-FFT-legacy/Example Recordings/tests_for_comparing_1st_nfreq/50cm_adxl/08-12_11-47-59_adxl6cmfromtip2cmID/accelerometer_data.npy',
-                            smoothing=100, window_type='hann', zero_padding=4096, annotate_peaks=True, magnitude_scale='linear', frequency_scale='log', show_plot=True, crop_beginning=True)
+                            smoothing=0, window_type='hann', zero_padding=4096, annotate_peaks=True, magnitude_scale='linear', frequency_scale='log', show_plot=True, crop_beginning=True)
