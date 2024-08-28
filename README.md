@@ -34,7 +34,7 @@ This repository contains a set of tools and scripts designed for performing moda
 ## Requirements
 
 - **Hardware:**
-  - Raspberry Pi 5
+  - Raspberry Pi (5)
   - ADXL357 Accelerometer (primary)
   - LSM6DS3 Accelerometer (optional)
   - Connecting wires
@@ -139,6 +139,7 @@ This script plots both the Short-Time Fourier Transform (STFT) and the Fast Four
 
 - **STFT:** Helps analyze how the frequency content of the signal evolves over time. Used to compare how the recording went.
 - **FFT:** Provides a snapshot of the frequency content of the entire signal. Used to find frequency peaks aka natural freq of the recording
+- 
 
 #### 4. `save_plain_npy_fixed_samplerate.py`
 
@@ -147,10 +148,10 @@ This script saves the accelerometer data to a numpy file while maintaining a fix
 - **Usage:** Run this script within the desired directory to record and save data for later analysis.
 - **Output:** A numpy file containing the recorded accelerometer data.
 
-### Usage Instructions
+### Usage Instructions    
 
 #### Recording Data
-
+   
 1. Navigate to the desired folder where you want to save the data:
 
    ```bash
@@ -165,6 +166,9 @@ This script saves the accelerometer data to a numpy file while maintaining a fix
    python save_plain_npy_fixed_samplerate.py
    ```
   2.2 To play sweep sound while saving: (Make sure volume level is decent)
+   ```bash
+   python Play_Sweep_and_Record.py
+   ```
 
 #### Analyzing Data
 
