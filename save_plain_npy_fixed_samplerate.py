@@ -1,5 +1,5 @@
 import os
-os.environ['DISPLAY'] = ':0'  # to run the code from ssh but show on the monitor do not delete
+os.environ['DISPLAY'] = ':0'  # to run the code from SSH but show on the monitor do not delete
 import time
 import numpy as np
 from datetime import datetime
@@ -19,6 +19,13 @@ REG_RANGE = 0x2C      # Range register for ADXL357
 bus = smbus.SMBus(1)
 
 def init_ADXL357(MEASUREMENT_RANGE):
+    """
+    Initializes the ADXL357 accelerometer by resetting the device, setting the output data rate (ODR),
+    configuring the measurement range, and enabling measurement mode.
+
+    Parameters:
+    MEASUREMENT_RANGE (int): The measurement range in g (10, 20, or 40).
+    """
     # Reset the device
     bus.write_byte_data(I2C_ADDRESS, REG_RESET, 0x52)  # Reset command
     time.sleep(0.1)  # Wait for the reset to complete
@@ -39,6 +46,15 @@ def init_ADXL357(MEASUREMENT_RANGE):
     bus.write_byte_data(I2C_ADDRESS, REG_POWER_CTL, 0x06)  # Enable measurement mode
 
 def read_accel_data(MEASUREMENT_RANGE):
+    """
+    Reads the Z-axis acceleration data from the ADXL357 accelerometer and converts it to g units.
+
+    Parameters:
+    MEASUREMENT_RANGE (int): The measurement range in g (10, 20, or 40).
+
+    Returns:
+    float: The Z-axis acceleration in g.
+    """
     # Read 3 bytes for Z-axis
     z = bus.read_i2c_block_data(I2C_ADDRESS, REG_ZDATA3, 3)
     
@@ -49,6 +65,7 @@ def read_accel_data(MEASUREMENT_RANGE):
     if z_data & (1 << 19):
         z_data -= (1 << 20)
     
+    # Convert raw data to g units based on the measurement range
     if MEASUREMENT_RANGE == 10:
         z_g = z_data * 0.0000187  # Scale for 10g range
     elif MEASUREMENT_RANGE == 20:
@@ -59,10 +76,32 @@ def read_accel_data(MEASUREMENT_RANGE):
     return z_g
 
 def save_accelerometer_numpy(z_data, timestamps, run_time):
+    """
+    Saves the accelerometer data and timestamps to a numpy array file.
+
+    Parameters:
+    z_data (list): List of Z-axis acceleration data.
+    timestamps (list): List of timestamps corresponding to the acceleration data.
+    run_time (str): The directory name where the data will be saved.
+
+    Returns:
+    str: The file path of the saved numpy array.
+    """
     np.save(os.path.join(run_time, 'accelerometer_data.npy'), np.array([timestamps, z_data]))
     return os.path.join(run_time, 'accelerometer_data.npy')
 
 def collect_accelerometer_data(duration=None, custom_name=None, measurement_range=10):
+    """
+    Collects Z-axis accelerometer data for a specified duration and saves it to a numpy array.
+
+    Parameters:
+    duration (float, optional): The duration for data collection in seconds. If None, the user is prompted to input a value.
+    custom_name (str, optional): A custom name to append to the directory where data is saved. If None, the user is prompted to input a value.
+    measurement_range (int, optional): The measurement range in g (10, 20, or 40). Defaults to 10g.
+
+    Returns:
+    str: The file path of the saved numpy array.
+    """
     # Global variables for accelerometer data
     z_axis_data = []
     timestamps_data = []
