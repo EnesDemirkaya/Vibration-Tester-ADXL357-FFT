@@ -150,7 +150,7 @@ def plot_fft_stft(timestamps: np.ndarray,
     if magnitude_scale == 'log':
         axs[1].set_xscale('log')
     
-    f, t, Zxx = stft(waveform_windowed, freq, noverlap=overlap, nperseg=ns, window='hann', nfft=ns * 2)
+    f, t, Zxx = stft(waveform, freq, noverlap=overlap, nperseg=ns, window='hann', nfft=ns * 2)
     
     axs[0].pcolormesh(t, f, np.abs(Zxx), shading='auto', cmap='viridis')
     if frequency_scale == 'log':
