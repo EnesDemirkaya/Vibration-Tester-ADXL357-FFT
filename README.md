@@ -59,10 +59,11 @@ pip install numpy pyqtgraph smbus smbus2
 
 | Raspberry Pi Pin | ADXL357 Pin | Description             |
 |------------------|-------------|-------------------------|
-| 3.3V             | VDD         | Power Supply            |
-| GND              | GND         | Ground                  |
+| 3.3V             | VDD VCC     | Power Supply            |
+| GND              | GND GND     | Ground                  |
 | GPIO 2 (SDA1)    | SDA         | I2C Data Line           |
 | GPIO 3 (SCL1)    | SCL         | I2C Clock Line          |
+Warning:Use both GND and VCC of the sensor, use 3.3V NOT 5V.
 
 ### Wiring Table for LSM6DS3 (Optional)
 
@@ -111,7 +112,6 @@ python "Check I2C Speed.py"
 
 ### Folder Structure
 
-- **`ADXL357/`**: Contains scripts and tools specifically for the ADXL357 accelerometer.
 - **`LSM6DS3 Accelerometer/`**: Contains scripts for the LSM6DS3 accelerometer.
 - **`Example Recordings/`**: A folder with recorded data and numpy array files for later comparison.
 - **`Check I2C Speed.py`**: Script to check the I2C communication speed on the Raspberry Pi.
