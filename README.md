@@ -224,6 +224,7 @@ This script saves the accelerometer data to a numpy file while maintaining a fix
 ## MATLAB Codes
 
 ### Explanation for `leonard3_only_length_measured_peaks.mlx`
+![alt text](https://github.com/EnesDemirkaya/Vibration-Tester-ADXL357-FFT/blob/4c31f2518591db9c4d7b30df0d6ffec5a7e070e7/Natural_Freq_Calculation_MATLAB/Example%20Output%20Figures/2D_Plot_TipMass_5g_Material_Aluminum_Width_50mm.png?raw=true)
 
 #### Overview
 This MATLAB script calculates the natural frequencies of a cantilever beam with a tip mass using both analytical methods and compares these to experimentally measured frequencies. The script iterates over different beam lengths and computes the natural frequencies for each length. The calculated frequencies are then compared with measured frequencies recorded in a spreadsheet, and the results are plotted.
@@ -269,6 +270,16 @@ This MATLAB script calculates the natural frequencies of a cantilever beam with 
 - **Updating the Spreadsheet:** After performing an experiment and recording the natural frequencies via FFT analysis, update the spreadsheet with the new frequencies and mode numbers corresponding to the different beam lengths. This step is crucial for accurate comparison and validation of the calculated frequencies.
 
 - **Modifying Parameters:** If the material, dimensions, or tip mass change for a new experiment, you must update the corresponding variables (`Bb`, `d`, `E`, `Mt`, `Db`) at the beginning of the script. This ensures that the calculations reflect the new setup and provide accurate results.
+
+### Explanation for `ModeShapeTipMassRitz.mlx`
+
+
+![alt text](https://github.com/EnesDemirkaya/Vibration-Tester-ADXL357-FFT/blob/4c31f2518591db9c4d7b30df0d6ffec5a7e070e7/Natural_Freq_Calculation_MATLAB/Example%20Output%20Figures/ModeShapes.png?raw=true)
+
+#### Overview
+This MATLAB script calculates the mode shapes of a cantilever beam with a tip mass using both analytical methods.
+
+
 
 ## To-Do List
 
