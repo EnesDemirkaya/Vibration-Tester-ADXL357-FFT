@@ -1,6 +1,3 @@
-Certainly! Here's the updated README with the requested changes:
-
----
 
 # Modal and Damping Analysis of a Cantilever Beam
 
@@ -345,10 +342,3 @@ Below is a list of additional components used in this project:
    - [Link](https://www.digikey.com/short/pv871vbd) (Part Number: EVAL-ADXL357Z)
    - Price: $45
 
----
-
-This additional component list will help ensure that all necessary parts are accounted for and easily accessible for replicating or building upon this project.
-
----
-
-Let me know if any further adjustments are needed!
