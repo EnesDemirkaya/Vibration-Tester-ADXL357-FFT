@@ -1,30 +1,32 @@
+Certainly! Here's the updated README with the requested changes:
+
+---
+
 # Modal and Damping Analysis of a Cantilever Beam
 
 ## Contents
 
 1. [Overview](#overview)
 2. [Requirements](#requirements)
-3. [Hardware Setup](#hardware-setup)
-   - [Wiring Table for ADXL357](#wiring-table-for-adxl357)
-   - [Wiring Table for LSM6DS3 (Optional)](#wiring-table-for-lsm6ds3-optional)
-4. [Setting Up I2C Speed](#setting-up-i2c-speed)
-   - [Checking I2C Speed](#checking-i2c-speed)
-   - [Changing I2C Speed to 400kHz](#changing-i2c-speed-to-400khz)
+3. [Nomenclature](#nomenclature)
+4. [Setup](#setup)
+   - [Wiring](#wiring)
+   - [Remote Connection (VNC and SSH) (Optional)](#remote-connection-vnc-and-ssh-optional)
+   - [Sound Output](#sound-output)
 5. [Repository Structure and Code Explanation](#repository-structure-and-code-explanation)
    - [Folder Structure](#folder-structure)
    - [Code Descriptions](#code-descriptions)
-     - [1. Check I2C Speed.py](#1-check-i2c-speedpy)
-     - [2. Damping ratio Exponential Decay.py](#2-damping-ratio-exponential-decaypy)
-     - [3. Plot STFT and FFT.py](#3-plot-stft-and-fftpy)
-     - [4. save_plain_npy_fixed_samplerate.py](#4-save_plain_npy-fixed-sampleratepy)
-6. [Usage Instructions](#usage-instructions)
+6. [Usage Procedure](#usage-procedure)
    - [Recording Data](#recording-data)
    - [Analyzing Data](#analyzing-data)
-7. [To-Do List](#to-do-list)
-8. [Resources](#resources)
-9. [License](#license)
-10. [Contact](#contact)
-11. [Additional Components](#additional-components)
+   - [Beam with Tip Mass Computational Natural Frequencies](#beam-with-tip-mass-computational-natural-frequencies)
+7. [MATLAB Codes](#matlab-codes)
+   - [Explanation for `leonard3_only_length_measured_peaks.mlx`](#explanation-for-leonard3_only_length_measured_peaksmlx)
+8. [To-Do List](#to-do-list)
+9. [Resources](#resources)
+10. [License](#license)
+11. [Contact](#contact)
+12. [Additional Components](#additional-components)
 
 ## Overview
 
@@ -37,12 +39,17 @@ This repository contains a set of tools and scripts designed for performing moda
   - ADXL357 Accelerometer (primary)
   - LSM6DS3 Accelerometer (optional)
   - Connecting wires
+  - Beam (e.g., Aluminum or HDPE)
+  - Sound Amplifier (optional)
+  - Vise for securing the beam and granular box
 
 - **Software:**
   - Python 3.x
   - NumPy (for numerical computations)
   - PyQtGraph (for plotting)
   - smbus or smbus2 (for I2C communication)
+  - VSCode with Remote-SSH extension (optional)
+  - VNC Viewer for remote desktop access (optional)
 
 ### Installing Dependencies
 
@@ -52,7 +59,26 @@ You can install the required Python packages using `pip`:
 pip install numpy pyqtgraph smbus smbus2
 ```
 
-## Hardware Setup
+## Nomenclature
+
+- **Acc:** Accelerometer (ADXL357)
+- **Old acc:** Legacy accelerometer (LSM6DS3)
+- **FFT:** Fast Fourier Transform
+- **STFT:** Short Time Fourier Transform
+- **SSH:** Secure Shell protocol for securely sending commands to a computer over an unsecured network.
+- **VNC:** Virtual Network Computing, a graphical desktop-sharing system using the Remote Frame Buffer protocol to control another computer remotely.
+
+## Setup
+
+### Wiring
+
+1. **Install the Beam and Granular Box:**
+   - Secure the beam and granular box using a vise.
+
+2. **Wire the Accelerometer:**
+   - Wire the harness according to general I2C connections.
+   - **Important:** Use both grounds and both VCCs in the ADXL357. Ensure you use **3.3V, NOT 5V**.
+   - Attach the accelerometer to the beam and secure the wiring to prevent oscillation like a pendulum.
 
 ### Wiring Table for ADXL357
 
@@ -74,39 +100,43 @@ pip install numpy pyqtgraph smbus smbus2
 | GPIO 2 (SDA1)    | SDA         | I2C Data Line           |
 | GPIO 3 (SCL1)    | SCL         | I2C Clock Line          |
 
-## Setting Up I2C Speed
+### Remote Connection (VNC and SSH) (Optional)
 
-To achieve a high sampling rate with the ADXL357, the I2C speed on the Raspberry Pi should be set to 400kHz. Below are instructions to verify and change the I2C speed.
+1. **Connect Raspberry Pi to the Internet:**
+   - Use an Ethernet connection to ensure a static IP address (e.g., `129.10.126.255`).
+   
+2. **SSH into Raspberry Pi:**
+   - **Install the Remote-SSH Extension in VSCode:**
+     - Open VSCode, press `Ctrl + Shift + X`, search for "Remote - SSH," and install it.
+   - **Add New SSH Host:**
+     - Open the Command Palette (`Ctrl + Shift + P`).
+     - Type `Remote-SSH: Connect to Host...` and select it.
+     - Enter the SSH connection string in the format: `ssh pi@<IP address>` (e.g., `ssh pi@129.10.126.255`).
+     - Press Enter and follow the prompts to add this to your SSH configuration file with a friendly name like `cslab`.
+   - **Enter the Password:**
+     - When prompted, enter the password for the `pi` user: `2024`.
+   - **Select Python Interpreter:**
+     - Once connected, select the Python interpreter located at `/usr/bin/python3` on the Raspberry Pi. If you don’t see a prompt, manually select the Python interpreter by opening the Command Palette (`Ctrl + Shift + P`) and typing `Python: Select Interpreter`.
 
-### Checking I2C Speed
+3. **VNC Connection:**
+   - For applications requiring a display (like GUI or plots), ensure remote desktop access via VNC is configured on the Raspberry Pi or use a monitor.
+   - **Connect using VNC Viewer:**
+     - Username: `pi`
+     - Password: `2024`
+   - Download VNC Viewer from [RealVNC](https://www.realvnc.com/en/connect/download/viewer/).
 
-Use the `Check I2C Speed.py` script to verify the current I2C speed:
-
-```bash
-python "Check I2C Speed.py"
-```
-
-### Changing I2C Speed to 400kHz
-
-1. Open the `/boot/firmware/config.txt` file:
-
-   ```bash
-   sudo nano /boot/firmware/config.txt
+4. **Display Configuration:**
+   - When running code that executes a window (e.g., a UI or plot), sometimes it encounters an issue finding a display because the user ran the code through SSH. To fix this, set the display environment variable manually in the code using:
+   ```python
+   os.environ['DISPLAY'] = ':0'  # to run the code from SSH but show on the monitor
    ```
+   - This is normally set up automatically when logging into a desktop environment. For more details, see [What is DISPLAY=:0?](https://unix.stackexchange.com/questions/193827/what-is-display-0).
 
-2. Add or modify the following line to set the I2C speed:
+### Sound Output
 
-   ```bash
-   dtparam=i2c_arm_baudrate=400000
-   ```
-
-3. Save the file and exit the editor (Ctrl+X, then Y, and Enter).
-
-4. Reboot your Raspberry Pi to apply the changes:
-
-   ```bash
-   sudo reboot
-   ```
+- The Raspberry Pi 5 lacks a sound output jack. To output sound:
+  - Use a USB/HDMI to aux adapter.
+  - Alternatively, use a monitor with an aux out, ensuring the monitor is turned on.
 
 ## Repository Structure and Code Explanation
 
@@ -138,7 +168,9 @@ This script calculates the damping ratio of the cantilever beam using the expone
 This script plots both the Short-Time Fourier Transform (STFT) and the Fast Fourier Transform (FFT) of the accelerometer data.
 
 - **STFT:** Helps analyze how the frequency content of the signal evolves over time. Used to compare how the recording went.
-- **FFT:** Provides a snapshot of the frequency content of the entire signal. Used to find frequency peaks aka natural freq of the recording
+- **FFT:** Provides a snapshot of the frequency content of the entire
+
+ signal. Used to find frequency peaks aka natural freq of the recording
 
 **Key Features:**
 
@@ -159,45 +191,87 @@ This script saves the accelerometer data to a numpy file while maintaining a fix
 - **Usage:** Run this script within the desired directory to record and save data for later analysis.
 - **Output:** A numpy file containing the recorded accelerometer data.
 
-### Usage Instructions    
+## Usage Procedure
 
-#### Recording Data
-   
-1. Navigate to the desired folder where you want to save the data:
+### Reconnect to Remote Host via VSCode Remote
 
-   ```bash
-   cd path/to/folder
-   ```
+- Ensure that your Raspberry Pi is connected to the network and accessible via SSH using the steps described in the [Remote Connection (VNC and SSH)](#remote-connection-vnc-and-ssh-optional) section.
+- Enter the `Vibration-Tester-ADXL357-FFT` folder on the Raspberry Pi's Desktop.
 
-2. Run the recording script to collect data at a fixed sample rate:
+### Recording Data
 
-   - **To only save:** (optionally make volume zero and use the second option)
+1. **Create a Folder for Data:**
+   - Use `mkdir` and `cd` to create and enter a folder where you will record the data.
 
-     ```bash
-     python save_plain_npy_fixed_samplerate.py
-     ```
+2. **Run the Recording Script:**
+   - **If sound generation is required:** Run the `Play_Sweep_and_Record.py` script to play a sweep sound while recording.
+   - **If no sound generation is required:** Run the `save_plain_npy_fixed_samplerate.py` script.
 
-   - **To play sweep sound while saving:** (Make sure volume level is decent)
+### Analyzing Data
 
-     ```bash
-     python Play_Sweep_and_Record.py
-     ```
+1. **Damping Ratio Calculation:**
+   - Use the `Damping ratio Exponential Decay.py` script to analyze the data and generate plots showing the exponential decay fit and identified peaks.
 
-#### Analyzing Data
+2. **Frequency Analysis:**
+   - Use the `Plot STFT and FFT.py` script to visualize the frequency content of the accelerometer data.
 
-- **Damping Ratio Calculation:** Use the
+### Beam with Tip Mass Computational Natural Frequencies
 
- `Damping ratio Exponential Decay.py` script to calculate the damping ratio of the cantilever beam.
+1. **Run the MATLAB Code:**
+   - Run one of the MATLAB codes according to the beam parameters you want to iterate over. Edit the values defined at the beginning of the code.
+   - Change the eigenvalue iteration final value to find more or fewer modes.
 
-  ```bash
-  python "Damping ratio Exponential Decay.py"
-  ```
+2. **Edit the Excel File:**
+   - Update the `points_data.xlsx` file in the same folder to change the plot of the measured natural frequencies. This is essential for comparing the computational results with experimental data.
 
-- **Frequency Analysis:** Use the `Plot STFT and FFT.py` script to visualize the frequency content of the accelerometer data.
+## MATLAB Codes
 
-  ```bash
-  python "Plot STFT and FFT.py"
-  ```
+### Explanation for `leonard3_only_length_measured_peaks.mlx`
+
+#### Overview
+This MATLAB script calculates the natural frequencies of a cantilever beam with a tip mass using both analytical methods and compares these to experimentally measured frequencies. The script iterates over different beam lengths and computes the natural frequencies for each length. The calculated frequencies are then compared with measured frequencies recorded in a spreadsheet, and the results are plotted.
+
+#### Steps in the Script
+
+1. **Initialization of Beam Parameters:**
+   - **`Bb = 50 mm`:** Width of the beam.
+   - **`d = 2700 kg/m³`:** Density of the beam material (aluminum in this case).
+   - **`E = 70e9 Pa`:** Modulus of elasticity of the beam material.
+   - **`Mt = 5 g`:** Tip mass attached to the free end of the beam.
+   - **`L_values`:** A range of beam lengths over which the natural frequencies will be calculated.
+   - **`Db = 2 mm`:** Depth of the beam.
+
+   *Note: These parameters should be adjusted if you are using a different material or if the experiment involves different dimensions or a different tip mass.*
+
+2. **Symbolic Equations:**
+   - The characteristic equation of the beam, including the tip mass effect, is defined using symbolic variables in MATLAB. This equation is essential for determining the natural frequencies by solving for the values of `βL`, where `L` is the beam length.
+
+   - The equation used corresponds to the one shown in the image, where `m` is the mass per unit length of the beam, and `M` is the mass attached at the free end.
+
+3. **Iteration Over Lengths:**
+   - For each length in `L_values`, the script:
+     - Calculates the mass of the beam and the moment of inertia.
+     - Constructs the characteristic equation specific to that length.
+     - Solves for the first four solutions of `βL` using `vpasolve`.
+     - Calculates the natural frequencies (`fn`) from these solutions and stores them.
+
+4. **Comparison with Experimental Data:**
+   - The script reads experimentally measured natural frequencies from a spreadsheet (`points_data.xlsx`). This data must be updated manually after recording the peaks via FFT analysis from actual experimental data. Each row in the spreadsheet should contain the length of the beam, the measured frequency, and the corresponding mode number.
+
+   - The script then plots the calculated natural frequencies against the lengths and overlays the experimentally measured frequencies for comparison.
+
+5. **Visualization:**
+   - The script generates a 2D plot with the length of the beam on the x-axis and the natural frequencies on the y-axis (logarithmic scale).
+   - It also adds annotations to the plot, indicating the beam material, dimensions, and tip mass.
+
+6. **Output:**
+   - The generated plot is saved in an output folder as both a `.png` and a `.fig` file. The filename includes details about the tip mass, beam material, and beam width for easy identification.
+
+#### Important Notes:
+
+- **Updating the Spreadsheet:** After performing an experiment and recording the natural frequencies via FFT analysis, update the spreadsheet with the new frequencies and mode numbers corresponding to the different beam lengths. This step is crucial for accurate comparison and validation of the calculated frequencies.
+
+- **Modifying Parameters:** If the material, dimensions, or tip mass change for a new experiment, you must update the corresponding variables (`Bb`, `d`, `E`, `Mt`, `Db`) at the beginning of the script. This ensures that the calculations reflect the new setup and provide accurate results.
 
 ## To-Do List
 
@@ -247,7 +321,9 @@ Below is a list of additional components used in this project:
 
 2. **Vibration Generator**: EISCO Vibration Generator, Total Frequency Range: 1 to 5 kHz
    - [Link](https://a.co/d/0ieYArgP)
-   - Price: $160
+  
+
+ - Price: $160
 
 3. **Cable between Generator and Amplifier**: 4MM Banana Plug Test Cables
    - [Link](https://a.co/d/0iabKKZL)
@@ -272,3 +348,7 @@ Below is a list of additional components used in this project:
 ---
 
 This additional component list will help ensure that all necessary parts are accounted for and easily accessible for replicating or building upon this project.
+
+---
+
+Let me know if any further adjustments are needed!
