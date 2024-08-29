@@ -120,7 +120,6 @@ pip install numpy pyqtgraph smbus smbus2
    - For applications requiring a display (like GUI or plots), ensure remote desktop access via VNC is configured on the Raspberry Pi or use a monitor.
    - **Connect using VNC Viewer:**
      - Username: `pi`
-     - Password: `2024`
    - Download VNC Viewer from [RealVNC](https://www.realvnc.com/en/connect/download/viewer/).
 
 4. **Display Configuration:**
