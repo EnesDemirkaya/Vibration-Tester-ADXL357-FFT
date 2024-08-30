@@ -109,7 +109,7 @@ pip install numpy pyqtgraph smbus smbus2
    - **Add New SSH Host:**
      - Open the Command Palette (`Ctrl + Shift + P`).
      - Type `Remote-SSH: Connect to Host...` and select it.
-     - Enter the SSH connection string in the format: `ssh pi@<IP address>` (e.g., `ssh pi@129.10.126.255`).
+     - Enter the SSH connection string in the format: `ssh cslab@<IP address>` (e.g., `ssh cslab@129.10.126.255`).
      - Press Enter and follow the prompts to add this to your SSH configuration file with a friendly name like `cslab`.
    - **Enter the Password:**
      - When prompted, enter the password for the `pi` user.
@@ -119,7 +119,7 @@ pip install numpy pyqtgraph smbus smbus2
 3. **VNC Connection:**
    - For applications requiring a display (like GUI or plots), ensure remote desktop access via VNC is configured on the Raspberry Pi or use a monitor.
    - **Connect using VNC Viewer:**
-     - Username: `pi`
+     - Username: `cslab`
    - Download VNC Viewer from [RealVNC](https://www.realvnc.com/en/connect/download/viewer/).
 
 4. **Display Configuration:**
