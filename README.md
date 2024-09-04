@@ -112,7 +112,7 @@ pip install numpy pyqtgraph smbus smbus2
      - Enter the SSH connection string in the format: `ssh cslab@<IP address>` (e.g., `ssh cslab@129.10.126.255`).
      - Press Enter and follow the prompts to add this to your SSH configuration file with a friendly name like `cslab`.
    - **Enter the Password:**
-     - When prompted, enter the password for the `pi` user.
+     - When prompted, enter the password for the `cslab` user.
    - **Select Python Interpreter:**
      - Once connected, select the Python interpreter located at `/usr/bin/python3` on the Raspberry Pi. If you don’t see a prompt, manually select the Python interpreter by opening the Command Palette (`Ctrl + Shift + P`) and typing `Python: Select Interpreter`.
 
